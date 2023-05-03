@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WebsocketServer = void 0;
+exports.SocketioServer = void 0;
 const socket_io_1 = require("socket.io");
 const txRx_1 = require("./txRx");
-class WebsocketServer {
+class SocketioServer {
     constructor(httpServer, actions) {
         this.ioServer = new socket_io_1.Server(httpServer, {
             cors: {
@@ -21,4 +21,4 @@ class WebsocketServer {
         this.ioServer.emit(action, payload);
     }
 }
-exports.WebsocketServer = WebsocketServer;
+exports.SocketioServer = SocketioServer;

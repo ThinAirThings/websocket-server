@@ -2,7 +2,7 @@ import { Server } from "http"
 import { Server as IoServer, Socket } from "socket.io"
 import { rxToTx } from "./txRx"
 
-export class WebsocketServer{
+export class SocketioServer {
     ioServer: IoServer
     constructor(httpServer: Server, actions: Record<string, (payload: any)=>void>){
         this.ioServer = new IoServer(httpServer, {
