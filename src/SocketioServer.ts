@@ -16,7 +16,6 @@ export class SocketioServer {
                 socket.on(rxToTx(action), callback)
             }
         })
-
     }
     sendMessage(action: string, payload: Record<string, any>){
         this.ioServer.emit(action, payload)
