@@ -4,7 +4,7 @@ import { rxToTx } from "./txRx"
 
 export class SocketioServer {
     ioServer: IoServer
-    constructor(httpServer: Server, actions: Record<string, (payload: any, reply?:(messageId: string, payload: Record<string, any>)=>void)=>void>){
+    constructor(httpServer: Server, actions: Record<string, (payload: any, reply:(messageId: string, payload: Record<string, any>)=>void)=>void>){
         this.ioServer = new IoServer(httpServer, {
             cors: {
                 origin: '*',
