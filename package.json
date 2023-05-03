@@ -11,6 +11,10 @@
   "scripts": {
     "npmpub": "tsc && git add . && git commit -m \"mod\" && git push && npm version patch && npm publish --access public"
   },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/",
+    "access": "public"
+  },
   "keywords": [],
   "author": "Dan Lannan",
   "license": "MIT",
