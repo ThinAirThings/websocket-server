@@ -9,7 +9,7 @@
     "url": "https://github.com/ThinAirThings/websocket-server.git"
   },
   "scripts": {
-    "npmpub": "tsc && git add . && git commit -m \"mod\" && git push && npm version patch && npm publish --access public"
+    "npmpub": "tsc && git add . && git commit -m \"mod\" && git push && npm version patch && npm publish"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/",

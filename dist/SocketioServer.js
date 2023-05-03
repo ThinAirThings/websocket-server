@@ -13,7 +13,9 @@ class SocketioServer {
         this.ioServer.on('connection', (socket) => {
             console.log('a user connected');
             for (const [action, callback] of Object.entries(actions)) {
-                socket.on((0, txRx_1.rxToTx)(action), callback);
+                socket.on((0, txRx_1.rxToTx)(action), (data) => {
+                    callback(data, socket);
+                });
             }
         });
     }
