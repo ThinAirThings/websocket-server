@@ -1,6 +1,6 @@
 import { Server } from "http"
 import { Server as IoServer, Socket } from "socket.io"
-import { rxToTx } from "./txTx"
+import { rxToTx } from "./txRx"
 
 export class WebsocketServer{
     ioServer: IoServer
