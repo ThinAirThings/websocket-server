@@ -14,8 +14,11 @@ class SocketioServer {
             console.log('a user connected');
             for (const [action, callback] of Object.entries(actions)) {
                 socket.on((0, txRx_1.rxToTx)(action), (data) => {
-                    const reply = (messageId, payload) => {
-                        socket.emit(messageId, payload);
+                    const reply = (messageId, payload, status) => {
+                        socket.emit(messageId, {
+                            status,
+                            payload
+                        });
                     };
                     callback(data, reply);
                 });

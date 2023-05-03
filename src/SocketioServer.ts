@@ -4,7 +4,9 @@ import { rxToTx } from "./txRx"
 
 export class SocketioServer {
     ioServer: IoServer
-    constructor(httpServer: Server, actions: Record<string, (payload: any, reply:(messageId: string, payload: Record<string, any>)=>void)=>void>){
+    constructor(httpServer: Server, actions: Record<
+        string, (payload: any, reply:(messageId: string, payload: Record<string, any>, status?: "COMPLETE"|"RUNNING"|"ERROR")=>void)=>void
+    >){
         this.ioServer = new IoServer(httpServer, {
             cors: {
                 origin: '*',
@@ -14,8 +16,11 @@ export class SocketioServer {
             console.log('a user connected')
             for (const [action, callback] of Object.entries(actions)){
                 socket.on(rxToTx(action), (data) => {
-                    const reply = (messageId: string, payload: Record<string, any>) => {
-                        socket.emit(messageId, payload)
+                    const reply = (messageId: string, payload: Record<string, any>, status?:"COMPLETE"|"RUNNING"|"ERROR") => {
+                        socket.emit(messageId, {
+                            status,
+                            payload
+                        })
                     }
                     callback(data, reply)
                 })
