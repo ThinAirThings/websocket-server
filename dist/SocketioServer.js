@@ -19,7 +19,7 @@ class SocketioServer {
                             socket.emit(rxPayload.messageId, {
                                 messageId: rxPayload.messageId,
                                 status,
-                                payload: action, txPayload
+                                payload: txPayload
                             });
                         }
                         else {

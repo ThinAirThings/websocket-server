@@ -24,7 +24,7 @@ export class SocketioServer {
                             socket.emit(rxPayload.messageId, {
                                 messageId: rxPayload.messageId,
                                 status,
-                                payload: action, txPayload
+                                payload: txPayload
                             })
                         } else {
                             console.log(`Non serializable object detected in txPayload for action: ${action}. Please check input for the txPayload.`);
