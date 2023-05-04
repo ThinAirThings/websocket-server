@@ -5,7 +5,7 @@ import { rxToTx } from "./txRx"
 export class SocketioServer {
     ioServer: IoServer
     constructor(httpServer: Server, actions: Record<string, 
-        <P extends Record<string, any>>(payload: P, {
+        <P>(payload: P, {
             reply,
             socket
         }: {
