@@ -5,7 +5,7 @@ import { rxToTx } from "./txRx"
 export class SocketioServer {
     ioServer: IoServer
     constructor(httpServer: Server, actions: Record<string, 
-        (payload: any, resources: {
+        (payload: unknown, resources: {
             reply:(payload: Record<string, any>, status?: "COMPLETE"|"RUNNING"|"ERROR")=>void
             socket: Socket
         } )=>void
