@@ -15,11 +15,23 @@ class SocketioServer {
             for (const [action, callback] of Object.entries(actions)) {
                 socket.on((0, txRx_1.rxToTx)(action), (rxPayload) => {
                     const reply = (txPayload, status) => {
-                        socket.emit(rxPayload.messageId, {
-                            messageId: rxPayload.messageId,
-                            status,
-                            payload: JSON.stringify(txPayload)
-                        });
+                        if (isSerializable(txPayload)) {
+                            socket.emit(rxPayload.messageId, {
+                                messageId: rxPayload.messageId,
+                                status,
+                                payload: txPayload
+                            });
+                        }
+                        else {
+                            console.log(`Non serializable object detected in txPayload for action: ${action}. Please check input for the txPayload.`);
+                            socket.emit(rxPayload.messageId, {
+                                messageId: rxPayload.messageId,
+                                "status": "ERROR",
+                                payload: {
+                                    message: `Non serializable object detected in txPayload for action: ${action}. Please check input for the txPayload on the server side.`
+                                }
+                            });
+                        }
                     };
                     callback(rxPayload, {
                         reply,
@@ -34,30 +46,19 @@ class SocketioServer {
     }
 }
 exports.SocketioServer = SocketioServer;
-// // Deal with sanitizing the txPayload as Socketio fails silently if it is not a plain object
-// type Serializable =
-//   | string
-//   | number
-//   | boolean
-//   | null
-//   | Serializable[]
-//   | { [key: string]: Serializable }
-//   | Buffer;
-// function isSerializable(value: any): value is Serializable {
-//     if (
-//         typeof value === 'string' ||
-//         typeof value === 'number' ||
-//         typeof value === 'boolean' ||
-//         value === null ||
-//         Buffer.isBuffer(value)
-//     ) {
-//         return true;
-//     }
-//     if (Array.isArray(value)) {
-//         return value.every(isSerializable);
-//     }
-//     if (typeof value === 'object' && value !== null) {
-//         return Object.values(value).every(isSerializable);
-//     }
-//     return false;
-// }
+function isSerializable(value) {
+    if (typeof value === 'string' ||
+        typeof value === 'number' ||
+        typeof value === 'boolean' ||
+        value === null ||
+        Buffer.isBuffer(value)) {
+        return true;
+    }
+    if (Array.isArray(value)) {
+        return value.every(isSerializable);
+    }
+    if (typeof value === 'object' && value !== null) {
+        return Object.values(value).every(isSerializable);
+    }
+    return false;
+}
