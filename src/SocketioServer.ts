@@ -24,7 +24,7 @@ export class SocketioServer {
                         socket.emit(rxPayload.messageId, {
                             messageId: rxPayload.messageId,
                             status,
-                            payload: txPayload
+                            payload: serializableSanitize(txPayload)
                         })
                     }
                     callback(rxPayload, {
@@ -38,4 +38,52 @@ export class SocketioServer {
     sendMessage(action: string, payload: Record<string, any>){
         this.ioServer.emit(action, payload)
     }
+}
+
+// Deal with sanitizing the txPayload as Socketio fails silently if it is not a plain object
+type Serializable =
+  | string
+  | number
+  | boolean
+  | null
+  | Serializable[]
+  | { [key: string]: Serializable }
+  | Buffer;
+
+function isSerializable(value: any): value is Serializable {
+  if (
+    typeof value === 'string' ||
+    typeof value === 'number' ||
+    typeof value === 'boolean' ||
+    value === null ||
+    Buffer.isBuffer(value)
+  ) {
+    return true;
+  }
+
+  if (Array.isArray(value)) {
+    return value.every(isSerializable);
+  }
+
+  if (typeof value === 'object' && value !== null) {
+    return Object.values(value).every(isSerializable);
+  }
+
+  return false;
+}
+
+function serializableSanitize(obj: Record<string, any>): Record<string, Serializable> {
+    const sanitized: Record<string, Serializable> = {};
+    for (const [key, value] of Object.entries(obj)) {
+        if (isSerializable(value)) {
+            if (typeof value === 'object' && value !== null) {
+                sanitized[key] = Array.isArray(value) ? value.map(serializableSanitize as any) : serializableSanitize(value);
+            } else {
+                sanitized[key] = value;
+            }
+        } else {
+            console.log(`Removing non-serializable object with key: ${key}`);
+        }
+    }
+    return sanitized;
 }

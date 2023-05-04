@@ -19,7 +19,7 @@ class SocketioServer {
                         socket.emit(rxPayload.messageId, {
                             messageId: rxPayload.messageId,
                             status,
-                            payload: txPayload
+                            payload: serializableSanitize(txPayload)
                         });
                     };
                     callback(rxPayload, {
@@ -35,3 +35,36 @@ class SocketioServer {
     }
 }
 exports.SocketioServer = SocketioServer;
+function isSerializable(value) {
+    if (typeof value === 'string' ||
+        typeof value === 'number' ||
+        typeof value === 'boolean' ||
+        value === null ||
+        Buffer.isBuffer(value)) {
+        return true;
+    }
+    if (Array.isArray(value)) {
+        return value.every(isSerializable);
+    }
+    if (typeof value === 'object' && value !== null) {
+        return Object.values(value).every(isSerializable);
+    }
+    return false;
+}
+function serializableSanitize(obj) {
+    const sanitized = {};
+    for (const [key, value] of Object.entries(obj)) {
+        if (isSerializable(value)) {
+            if (typeof value === 'object' && value !== null) {
+                sanitized[key] = Array.isArray(value) ? value.map(serializableSanitize) : serializableSanitize(value);
+            }
+            else {
+                sanitized[key] = value;
+            }
+        }
+        else {
+            console.log(`Removing non-serializable object with key: ${key}`);
+        }
+    }
+    return sanitized;
+}
