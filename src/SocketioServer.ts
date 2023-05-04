@@ -2,14 +2,17 @@ import { Server } from "http"
 import { Server as IoServer, Socket } from "socket.io"
 import { rxToTx } from "./txRx"
 
-type ActionCallback<P extends Record<string, any>> = (args: {
-    payload: P;
-    reply: (payload: Record<string, any>, status?: "COMPLETE" | "RUNNING" | "ERROR") => void;
-    socket: Socket;
-}) => void;
 export class SocketioServer {
     ioServer: IoServer
-    constructor(httpServer: Server, actions: {[key: string]: ActionCallback<Record<string, any>>;}){
+    constructor(httpServer: Server, actions: Record<string, 
+        <P extends Record<string, any>>(payload: P, {
+            reply,
+            socket
+        }: {
+            reply:(payload: Record<string, any>, status?: "COMPLETE"|"RUNNING"|"ERROR")=>void
+            socket: Socket
+        })=>void
+    >){
         this.ioServer = new IoServer(httpServer, {
             cors: {
                 origin: '*',
@@ -26,8 +29,7 @@ export class SocketioServer {
                             payload
                         })
                     }
-                    callback({
-                        payload,
+                    callback(payload, {
                         reply,
                         socket
                     })

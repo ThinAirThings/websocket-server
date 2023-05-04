@@ -21,8 +21,7 @@ class SocketioServer {
                             payload
                         });
                     };
-                    callback({
-                        payload,
+                    callback(payload, {
                         reply,
                         socket
                     });
