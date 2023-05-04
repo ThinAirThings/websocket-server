@@ -7,7 +7,7 @@ export class SocketioServer {
     constructor(httpServer: Server, actions: Record<string, 
         (payload: any, resources: {
             reply:(payload: Record<string, any>, status?: "COMPLETE"|"RUNNING"|"ERROR")=>void
-            socket: Socket
+            rxSocket: Socket
         } )=>void
     >){
         this.ioServer = new IoServer(httpServer, {
@@ -15,6 +15,7 @@ export class SocketioServer {
                 origin: '*',
             }
         })
+
         this.ioServer.on('connection', (socket: Socket) => {
             console.log('a user connected')
             for (const [action, callback] of Object.entries(actions)){
@@ -39,7 +40,7 @@ export class SocketioServer {
                     }
                     callback(rxPayload, {
                         reply,
-                        socket
+                        rxSocket: socket
                     })
                 })
             }

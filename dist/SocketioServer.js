@@ -35,7 +35,7 @@ class SocketioServer {
                     };
                     callback(rxPayload, {
                         reply,
-                        socket
+                        rxSocket: socket
                     });
                 });
             }
