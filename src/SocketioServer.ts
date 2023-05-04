@@ -82,7 +82,7 @@ function serializableSanitize(obj: Record<string, any>): Record<string, Serializ
                 sanitized[key] = value;
             }
         } else {
-            console.log(`Removing non-serializable object with key: ${key}`);
+            console.log(`Non serializable object detected in txPayload. Attempting to remove object and send. Please check input at: Key: ${key}, Value: ${value}`);
         }
     }
     return sanitized;

@@ -63,7 +63,7 @@ function serializableSanitize(obj) {
             }
         }
         else {
-            console.log(`Removing non-serializable object with key: ${key}`);
+            console.log(`Non serializable object detected in txPayload. Attempting to remove object and send. Please check input at: Key: ${key}, Value: ${value}`);
         }
     }
     return sanitized;
