@@ -9,7 +9,7 @@ type ActionCallback<P extends Record<string, any>> = (args: {
 export declare class SocketioServer {
     ioServer: IoServer;
     constructor(httpServer: Server, actions: {
-        [K in keyof Record<string, ActionCallback<any>>]: ActionCallback<any>;
+        [key: string]: ActionCallback<any>;
     });
     sendMessage(action: string, payload: Record<string, any>): void;
 }

@@ -9,7 +9,7 @@ type ActionCallback<P extends Record<string, any>> = (args: {
 }) => void;
 export class SocketioServer {
     ioServer: IoServer
-    constructor(httpServer: Server, actions: {[K in keyof Record<string, ActionCallback<any>>]: ActionCallback<any>;}){
+    constructor(httpServer: Server, actions: {[key: string]: ActionCallback<any>;}){
         this.ioServer = new IoServer(httpServer, {
             cors: {
                 origin: '*',
