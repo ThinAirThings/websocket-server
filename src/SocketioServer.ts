@@ -5,13 +5,10 @@ import { rxToTx } from "./txRx"
 export class SocketioServer {
     ioServer: IoServer
     constructor(httpServer: Server, actions: Record<string, 
-        <P>(payload: P, {
-            reply,
-            socket
-        }: {
+        <P>(payload: P, args: {
             reply:(payload: Record<string, any>, status?: "COMPLETE"|"RUNNING"|"ERROR")=>void
             socket: Socket
-        })=>void
+        } )=>void
     >){
         this.ioServer = new IoServer(httpServer, {
             cors: {
