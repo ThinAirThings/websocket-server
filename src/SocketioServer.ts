@@ -20,11 +20,15 @@ export class SocketioServer {
             for (const [action, callback] of Object.entries(actions)){
                 socket.on(rxToTx(action), (rxPayload: {messageId: string}) => {
                     const reply = (txPayload: Record<string, any>, status?:"COMPLETE"|"RUNNING"|"ERROR") => {
-                        socket.emit(rxPayload.messageId, {
-                            messageId: rxPayload.messageId,
-                            status,
-                            payload: serializableSanitize(action, txPayload)
-                        })
+                        if (isSerializable(txPayload)) {
+                            socket.emit(rxPayload.messageId, {
+                                messageId: rxPayload.messageId,
+                                status,
+                                payload: action, txPayload
+                            })
+                        } else {
+                            console.log(`Non serializable object detected in txPayload for action: ${action}. Please check input for the txPayload.`);
+                        }
                     }
                     callback(rxPayload, {
                         reply,
@@ -50,39 +54,23 @@ type Serializable =
   | Buffer;
 
 function isSerializable(value: any): value is Serializable {
-  if (
-    typeof value === 'string' ||
-    typeof value === 'number' ||
-    typeof value === 'boolean' ||
-    value === null ||
-    Buffer.isBuffer(value)
-  ) {
-    return true;
-  }
-
-  if (Array.isArray(value)) {
-    return value.every(isSerializable);
-  }
-
-  if (typeof value === 'object' && value !== null) {
-    return Object.values(value).every(isSerializable);
-  }
-
-  return false;
-}
-
-function serializableSanitize(action: string, obj: Record<string, any>): Record<string, Serializable> {
-    const sanitized: Record<string, Serializable> = {};
-    for (const [key, value] of Object.entries(obj)) {
-        if (isSerializable(value)) {
-            if (typeof value === 'object' && value !== null) {
-                sanitized[key] = Array.isArray(value) ? value.map(serializableSanitize as any) : serializableSanitize(action, value);
-            } else {
-                sanitized[key] = value;
-            }
-        } else {
-            console.log(`Non serializable object detected in txPayload for action: ${action}. Attempting to remove object and send. Please check input at: Key: ${key}, Value: ${value}`);
-        }
+    if (
+        typeof value === 'string' ||
+        typeof value === 'number' ||
+        typeof value === 'boolean' ||
+        value === null ||
+        Buffer.isBuffer(value)
+    ) {
+        return true;
     }
-    return sanitized;
+
+    if (Array.isArray(value)) {
+        return value.every(isSerializable);
+    }
+
+    if (typeof value === 'object' && value !== null) {
+        return Object.values(value).every(isSerializable);
+    }
+    return false;
 }
+

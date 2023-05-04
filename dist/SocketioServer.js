@@ -15,11 +15,16 @@ class SocketioServer {
             for (const [action, callback] of Object.entries(actions)) {
                 socket.on((0, txRx_1.rxToTx)(action), (rxPayload) => {
                     const reply = (txPayload, status) => {
-                        socket.emit(rxPayload.messageId, {
-                            messageId: rxPayload.messageId,
-                            status,
-                            payload: serializableSanitize(action, txPayload)
-                        });
+                        if (isSerializable(txPayload)) {
+                            socket.emit(rxPayload.messageId, {
+                                messageId: rxPayload.messageId,
+                                status,
+                                payload: action, txPayload
+                            });
+                        }
+                        else {
+                            console.log(`Non serializable object detected in txPayload for action: ${action}. Please check input for the txPayload.`);
+                        }
                     };
                     callback(rxPayload, {
                         reply,
@@ -49,21 +54,4 @@ function isSerializable(value) {
         return Object.values(value).every(isSerializable);
     }
     return false;
-}
-function serializableSanitize(action, obj) {
-    const sanitized = {};
-    for (const [key, value] of Object.entries(obj)) {
-        if (isSerializable(value)) {
-            if (typeof value === 'object' && value !== null) {
-                sanitized[key] = Array.isArray(value) ? value.map(serializableSanitize) : serializableSanitize(action, value);
-            }
-            else {
-                sanitized[key] = value;
-            }
-        }
-        else {
-            console.log(`Non serializable object detected in txPayload for action: ${action}. Attempting to remove object and send. Please check input at: Key: ${key}, Value: ${value}`);
-        }
-    }
-    return sanitized;
 }
