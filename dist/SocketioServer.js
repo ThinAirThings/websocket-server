@@ -18,7 +18,7 @@ class SocketioServer {
                         socket.emit(rxPayload.messageId, {
                             messageId: rxPayload.messageId,
                             status,
-                            txPayload
+                            payload: txPayload
                         });
                     };
                     callback(rxPayload, {
