@@ -17,6 +17,7 @@ class SocketioServer {
                     console.log(payload);
                     const reply = (payload, status) => {
                         console.log("Inside Reply");
+                        console.log(payload.messageId);
                         socket.emit(payload.messageId, {
                             messageId: payload.messageId,
                             status,
