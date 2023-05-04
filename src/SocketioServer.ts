@@ -10,9 +10,9 @@ export class SocketioServer {
             reply,
             socket
         }: {
-            payload?: P 
-            reply?:(payload: Record<string, any>, status?: "COMPLETE"|"RUNNING"|"ERROR")=>void
-            socket?: Socket
+            payload: P 
+            reply:(payload: Record<string, any>, status?: "COMPLETE"|"RUNNING"|"ERROR")=>void
+            socket: Socket
         })=>void
     >){
         this.ioServer = new IoServer(httpServer, {
