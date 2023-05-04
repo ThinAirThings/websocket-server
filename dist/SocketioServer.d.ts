@@ -1,8 +1,12 @@
 /// <reference types="node" />
 import { Server } from "http";
-import { Server as IoServer } from "socket.io";
+import { Server as IoServer, Socket } from "socket.io";
 export declare class SocketioServer {
     ioServer: IoServer;
-    constructor(httpServer: Server, actions: Record<string, (payload: any, reply: (payload: Record<string, any>, status?: "COMPLETE" | "RUNNING" | "ERROR") => void) => void>);
+    constructor(httpServer: Server, actions: Record<string, <P extends Record<string, any>>({ payload, reply, socket }: {
+        payload?: P;
+        reply?: (payload: Record<string, any>, status?: "COMPLETE" | "RUNNING" | "ERROR") => void;
+        socket?: Socket;
+    }) => void>);
     sendMessage(action: string, payload: Record<string, any>): void;
 }
