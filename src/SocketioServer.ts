@@ -2,19 +2,14 @@ import { Server } from "http"
 import { Server as IoServer, Socket } from "socket.io"
 import { rxToTx } from "./txRx"
 
+type ActionCallback<P extends Record<string, any>> = (args: {
+    payload: P;
+    reply: (payload: Record<string, any>, status?: "COMPLETE" | "RUNNING" | "ERROR") => void;
+    socket: Socket;
+}) => void;
 export class SocketioServer {
     ioServer: IoServer
-    constructor(httpServer: Server, actions: Record<string, 
-        <P extends Record<string, any>>({
-            payload,
-            reply,
-            socket
-        }: {
-            payload: P 
-            reply:(payload: Record<string, any>, status?: "COMPLETE"|"RUNNING"|"ERROR")=>void
-            socket: Socket
-        })=>void
-    >){
+    constructor(httpServer: Server, actions: {[K in keyof Record<string, ActionCallback<any>>]: ActionCallback<any>;}){
         this.ioServer = new IoServer(httpServer, {
             cors: {
                 origin: '*',
