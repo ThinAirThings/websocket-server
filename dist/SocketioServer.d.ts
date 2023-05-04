@@ -3,7 +3,7 @@ import { Server } from "http";
 import { Server as IoServer, Socket } from "socket.io";
 export declare class SocketioServer {
     ioServer: IoServer;
-    constructor(httpServer: Server, actions: Record<string, <P>(payload: P, args: {
+    constructor(httpServer: Server, actions: Record<string, <P extends Record<string, any>>(payload: P, resources: {
         reply: (payload: Record<string, any>, status?: "COMPLETE" | "RUNNING" | "ERROR") => void;
         socket: Socket;
     }) => void>);
