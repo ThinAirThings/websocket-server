@@ -19,6 +19,7 @@ export class SocketioServer {
             console.log('a user connected')
             for (const [action, callback] of Object.entries(actions)){
                 socket.on(rxToTx(action), (payload: {messageId: string}) => {
+                    console.log(payload)
                     const reply = (payload: Record<string, any>, status?:"COMPLETE"|"RUNNING"|"ERROR") => {
                         socket.emit(payload.messageId, {
                             messageId : payload.messageId,
