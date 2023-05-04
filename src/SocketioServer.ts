@@ -21,6 +21,7 @@ export class SocketioServer {
                 socket.on(rxToTx(action), (payload: {messageId: string}) => {
                     console.log(payload)
                     const reply = (payload: Record<string, any>, status?:"COMPLETE"|"RUNNING"|"ERROR") => {
+                        console.log("Inside Reply")
                         socket.emit(payload.messageId, {
                             messageId : payload.messageId,
                             status,
