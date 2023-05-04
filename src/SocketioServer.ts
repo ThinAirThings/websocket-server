@@ -23,7 +23,7 @@ export class SocketioServer {
                         socket.emit(rxPayload.messageId, {
                             messageId: rxPayload.messageId,
                             status,
-                            payload: JSON.parse(JSON.stringify(txPayload))
+                            payload: JSON.stringify(txPayload)
                         })
                     }
                     callback(rxPayload, {
