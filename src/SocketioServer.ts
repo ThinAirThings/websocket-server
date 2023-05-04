@@ -24,7 +24,7 @@ export class SocketioServer {
                         socket.emit(rxPayload.messageId, {
                             messageId: rxPayload.messageId,
                             status,
-                            payload: serializableSanitize(txPayload)
+                            payload: serializableSanitize(action, txPayload)
                         })
                     }
                     callback(rxPayload, {
@@ -72,17 +72,17 @@ function isSerializable(value: any): value is Serializable {
   return false;
 }
 
-function serializableSanitize(obj: Record<string, any>): Record<string, Serializable> {
+function serializableSanitize(action: string, obj: Record<string, any>): Record<string, Serializable> {
     const sanitized: Record<string, Serializable> = {};
     for (const [key, value] of Object.entries(obj)) {
         if (isSerializable(value)) {
             if (typeof value === 'object' && value !== null) {
-                sanitized[key] = Array.isArray(value) ? value.map(serializableSanitize as any) : serializableSanitize(value);
+                sanitized[key] = Array.isArray(value) ? value.map(serializableSanitize as any) : serializableSanitize(action, value);
             } else {
                 sanitized[key] = value;
             }
         } else {
-            console.log(`Non serializable object detected in txPayload. Attempting to remove object and send. Please check input at: Key: ${key}, Value: ${value}`);
+            console.log(`Non serializable object detected in txPayload for action: ${action}. Attempting to remove object and send. Please check input at: Key: ${key}, Value: ${value}`);
         }
     }
     return sanitized;
