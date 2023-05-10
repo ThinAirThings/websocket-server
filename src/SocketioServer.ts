@@ -55,6 +55,7 @@ export class SocketioServer {
             }
         })
         return {
+            channel,
             sendMessage: (action: string, payload: Record<string, any>) => {
                 channel.emit(action, payload)
             },

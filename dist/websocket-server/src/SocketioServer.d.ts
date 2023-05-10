@@ -8,6 +8,7 @@ export declare class SocketioServer {
         rxSocket: Socket;
     }) => void>);
     createChannel(channelId: string, actions: ConstructorParameters<typeof SocketioServer>[1]): {
+        channel: import("socket.io").Namespace<import("socket.io/dist/typed-events").DefaultEventsMap, import("socket.io/dist/typed-events").DefaultEventsMap, import("socket.io/dist/typed-events").DefaultEventsMap, any>;
         sendMessage: (action: string, payload: Record<string, any>) => void;
         sendVolatileMessage: (action: string, payload: Record<string, any>) => void;
     };

@@ -50,6 +50,7 @@ class SocketioServer {
             }
         });
         return {
+            channel,
             sendMessage: (action, payload) => {
                 channel.emit(action, payload);
             },
