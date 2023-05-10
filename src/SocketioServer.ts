@@ -46,7 +46,7 @@ export class SocketioServer {
             }
         })
     }
-    createChannel(channelId: string, actions: Record<string, (payload: any)=>void>){
+    createChannel(channelId: string, actions: ConstructorParameters<typeof SocketioServer>[1]){
         const channel = this.ioServer.of(channelId)
         channel.on('connection', (socket: Socket) => {
             console.log(`a user connected to channel: ${channelId}`)
