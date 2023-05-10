@@ -13,8 +13,7 @@ class SocketioServer {
         this.ioServer.on('connection', (socket) => {
             console.log('a user connected');
             for (const [action, callback] of Object.entries(actions)) {
-                socket.on((0, txRx_1.rxToTx)(action), (rxPayload, socketioReply) => {
-                    console.log(socketioReply);
+                socket.on((0, txRx_1.rxToTx)(action), (rxPayload) => {
                     const reply = (txPayload, status) => {
                         if (isSerializable(txPayload)) {
                             socket.emit(rxPayload.messageId, {

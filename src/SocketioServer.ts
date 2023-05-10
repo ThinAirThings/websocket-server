@@ -19,8 +19,7 @@ export class SocketioServer {
         this.ioServer.on('connection', (socket: Socket) => {
             console.log('a user connected')
             for (const [action, callback] of Object.entries(actions)){
-                socket.on(rxToTx(action), (rxPayload: {messageId: string}, socketioReply: (payload: any)=> void) => {
-                    console.log(socketioReply)
+                socket.on(rxToTx(action), (rxPayload: {messageId: string}) => {
                     const reply = (txPayload: Record<string, any>, status?:"COMPLETE"|"RUNNING"|"ERROR") => {
                         if (isSerializable(txPayload)) {
                             socket.emit(rxPayload.messageId, {
