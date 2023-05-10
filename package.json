@@ -2,8 +2,8 @@
   "name": "@thinairthings/websocket-server",
   "version": "1.0.45",
   "description": "Basic websocket server io utilities",
-  "main": "dist/websocket-server/index.js",
-  "types": "dist/websocket-server/index.d.ts",
+  "main": "dist/websocket-server/src/index.js",
+  "types": "dist/websocket-server/src/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/ThinAirThings/websocket-server.git"
