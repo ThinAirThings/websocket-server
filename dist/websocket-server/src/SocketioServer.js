@@ -44,6 +44,9 @@ class SocketioServer {
     sendMessage(action, payload) {
         this.ioServer.emit(action, payload);
     }
+    sendVolatileMessage(action, payload) {
+        this.ioServer.volatile.emit(action, payload);
+    }
 }
 exports.SocketioServer = SocketioServer;
 function isSerializable(value) {

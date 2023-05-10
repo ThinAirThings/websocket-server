@@ -49,6 +49,9 @@ export class SocketioServer {
     sendMessage(action: string, payload: Record<string, any>){
         this.ioServer.emit(action, payload)
     }
+    sendVolatileMessage(action: string, payload: Record<string, any>){
+        this.ioServer.volatile.emit(action, payload)
+    }
 }
 
 // Deal with sanitizing the txPayload as Socketio fails silently if it is not a plain object

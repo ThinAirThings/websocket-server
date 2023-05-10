@@ -8,4 +8,5 @@ export declare class SocketioServer {
         rxSocket: Socket;
     }) => void>);
     sendMessage(action: string, payload: Record<string, any>): void;
+    sendVolatileMessage(action: string, payload: Record<string, any>): void;
 }
