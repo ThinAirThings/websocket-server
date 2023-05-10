@@ -1,6 +1,6 @@
 import { Server } from "http"
 import { Server as IoServer, Socket } from "socket.io"
-import { rxToTx } from "./txRx"
+import { rxToTx } from "../../shared/txRx"
 
 export class SocketioServer {
     ioServer: IoServer
@@ -19,7 +19,8 @@ export class SocketioServer {
         this.ioServer.on('connection', (socket: Socket) => {
             console.log('a user connected')
             for (const [action, callback] of Object.entries(actions)){
-                socket.on(rxToTx(action), (rxPayload: {messageId: string}) => {
+                socket.on(rxToTx(action), (rxPayload: {messageId: string}, socketioReply: (payload: any)=> void) => {
+                    console.log(socketioReply)
                     const reply = (txPayload: Record<string, any>, status?:"COMPLETE"|"RUNNING"|"ERROR") => {
                         if (isSerializable(txPayload)) {
                             socket.emit(rxPayload.messageId, {
