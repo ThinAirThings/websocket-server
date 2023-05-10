@@ -46,7 +46,24 @@ export class SocketioServer {
             }
         })
     }
-    sendMessage(action: string, payload: Record<string, any>){
+    createChannel(channelId: string, actions: Record<string, (payload: any)=>void>){
+        const channel = this.ioServer.of(channelId)
+        channel.on('connection', (socket: Socket) => {
+            console.log(`a user connected to channel: ${channelId}`)
+            for (const [action, callback] of Object.entries(actions)){
+                socket.on(rxToTx(action), callback)
+            }
+        })
+        return {
+            sendMessage: (action: string, payload: Record<string, any>) => {
+                channel.emit(action, payload)
+            },
+            sendVolatileMessage: (action: string, payload: Record<string, any>) => {
+                channel.volatile.emit(action, payload)
+            }
+        }
+    }
+    sendMessage( action: string, payload: Record<string, any>){
         this.ioServer.emit(action, payload)
     }
     sendVolatileMessage(action: string, payload: Record<string, any>){

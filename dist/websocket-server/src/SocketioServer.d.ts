@@ -7,6 +7,10 @@ export declare class SocketioServer {
         reply: (payload: Record<string, any>, status?: "COMPLETE" | "RUNNING" | "ERROR") => void;
         rxSocket: Socket;
     }) => void>);
+    createChannel(channelId: string, actions: Record<string, (payload: any) => void>): {
+        sendMessage: (action: string, payload: Record<string, any>) => void;
+        sendVolatileMessage: (action: string, payload: Record<string, any>) => void;
+    };
     sendMessage(action: string, payload: Record<string, any>): void;
     sendVolatileMessage(action: string, payload: Record<string, any>): void;
 }
