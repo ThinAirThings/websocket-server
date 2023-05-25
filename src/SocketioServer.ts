@@ -56,7 +56,30 @@ export class SocketioServer {
             console.log(`a user connected to channel: ${channelId}`)
             console.log(`Number of users in channel: ${channelId}: ${channel.sockets.size}`)
             for (const [action, callback] of Object.entries(actions)){
-                socket.on(rxToTx(action), callback)
+                socket.on(rxToTx(action), (rxPayload: {messageId: string}) => {
+                    const reply = (txPayload: Record<string, any>, status?:"COMPLETE"|"RUNNING"|"ERROR") => {
+                        if (isSerializable(txPayload)) {
+                            socket.emit(rxPayload.messageId, {
+                                messageId: rxPayload.messageId,
+                                status,
+                                payload: txPayload
+                            })
+                        } else {
+                            console.log(`Non serializable object detected in txPayload for action: ${action}. Please check input for the txPayload.`);
+                            socket.emit(rxPayload.messageId, {
+                                messageId: rxPayload.messageId,
+                                "status": "ERROR",
+                                payload: {
+                                    message: `Non serializable object detected in txPayload for action: ${action}. Please check input for the txPayload on the server side.`
+                                }
+                            })
+                        }
+                    }
+                    callback(rxPayload, {
+                        reply,
+                        rxSocket: socket
+                    })
+                })
             }
             socket.on('disconnect', () => {
                 console.log(`a user disconnected from channel: ${channelId}`)
