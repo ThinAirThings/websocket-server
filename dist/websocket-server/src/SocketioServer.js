@@ -41,13 +41,18 @@ class SocketioServer {
             }
         });
     }
-    createChannel(channelId, actions) {
+    createChannel(channelId, actions, disconnectHandler) {
         const channel = this.ioServer.of(channelId);
         channel.removeAllListeners().on('connection', (socket) => {
             console.log(`a user connected to channel: ${channelId}`);
             for (const [action, callback] of Object.entries(actions)) {
                 socket.on((0, txRx_1.rxToTx)(action), callback);
             }
+            socket.on('disconnect', () => {
+                console.log(`a user disconnected from channel: ${channelId}`);
+                console.log(`Number of users in channel: ${channelId}: ${channel.sockets.size}`);
+                disconnectHandler?.(channel, socket);
+            });
         });
         return {
             channel,
