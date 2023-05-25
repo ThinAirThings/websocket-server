@@ -1,6 +1,6 @@
 {
   "name": "@thinairthings/websocket-server",
-  "version": "1.0.49",
+  "version": "1.0.50",
   "description": "Basic websocket server io utilities",
   "main": "dist/websocket-server/src/index.js",
   "types": "dist/websocket-server/src/index.d.ts",
