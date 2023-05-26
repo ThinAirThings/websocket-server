@@ -47,14 +47,17 @@ export class SocketioServer {
         })
     }
     createChannel(channelId: string, actions: ConstructorParameters<typeof SocketioServer>[1], {
+        connectHandler,
         disconnectHandler
     }:{ 
+        connectHandler?: (channel: ReturnType<SocketioServer['ioServer']['of']>, socket: Socket)=>void
         disconnectHandler?: (channel: ReturnType<SocketioServer['ioServer']['of']>, socket: Socket)=>void
     }){
         const channel = this.ioServer.of(channelId)
         channel.removeAllListeners().on('connection', (socket: Socket) => {
             console.log(`a user connected to channel: ${channelId}`)
             console.log(`Number of users in channel: ${channelId}: ${channel.sockets.size}`)
+            connectHandler?.(channel, socket)
             for (const [action, callback] of Object.entries(actions)){
                 socket.on(rxToTx(action), (rxPayload: {messageId: string}) => {
                     const reply = (txPayload: Record<string, any>, status?:"COMPLETE"|"RUNNING"|"ERROR") => {

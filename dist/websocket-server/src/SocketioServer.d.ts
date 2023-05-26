@@ -7,7 +7,8 @@ export declare class SocketioServer {
         reply: (payload: Record<string, any>, status?: "COMPLETE" | "RUNNING" | "ERROR") => void;
         rxSocket: Socket;
     }) => void>);
-    createChannel(channelId: string, actions: ConstructorParameters<typeof SocketioServer>[1], { disconnectHandler }: {
+    createChannel(channelId: string, actions: ConstructorParameters<typeof SocketioServer>[1], { connectHandler, disconnectHandler }: {
+        connectHandler?: (channel: ReturnType<SocketioServer['ioServer']['of']>, socket: Socket) => void;
         disconnectHandler?: (channel: ReturnType<SocketioServer['ioServer']['of']>, socket: Socket) => void;
     }): {
         channel: import("socket.io").Namespace<import("socket.io/dist/typed-events").DefaultEventsMap, import("socket.io/dist/typed-events").DefaultEventsMap, import("socket.io/dist/typed-events").DefaultEventsMap, any>;
