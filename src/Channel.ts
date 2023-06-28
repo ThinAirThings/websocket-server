@@ -51,37 +51,44 @@ export class SocketioChannel {
             console.log(`a user connected to channel: ${this.channelId}`)
             console.log(`Number of users in channel: ${this.channelId}: ${this._channel.sockets.size}`)
             this._connectionHandler?.(this._channel, socket)
-            this._actions && Object.entries(this._actions).forEach(([action, callback]) => {
-                socket.on(rxToTx(action), (rxPayload: {messageId: string}) => {
-                    const reply = (txPayload: Record<string, any>, status?:"COMPLETE"|"RUNNING"|"ERROR") => {
-                        if (isSerializable(txPayload)) {
-                            socket.emit(rxPayload.messageId, {
-                                messageId: rxPayload.messageId,
-                                status,
-                                payload: txPayload
-                            })
-                        } else {
-                            console.log(`Non serializable object detected in txPayload for action: ${action}. Please check input for the txPayload.`);
-                            socket.emit(rxPayload.messageId, {
-                                messageId: rxPayload.messageId,
-                                "status": "ERROR",
-                                payload: {
-                                    message: `Non serializable object detected in txPayload for action: ${action}. Please check input for the txPayload on the server side.`
-                                }
-                            })
-                        }
+            this.updateSocketListeners(socket)
+        })
+        this._channel.sockets.forEach((socket) => {
+            socket.removeAllListeners()
+            this.updateSocketListeners(socket)
+        })
+    }
+    private updateSocketListeners = (socket: Socket) => {
+        this._actions && Object.entries(this._actions).forEach(([action, callback]) => {
+            socket.on(rxToTx(action), (rxPayload: {messageId: string}) => {
+                const reply = (txPayload: Record<string, any>, status?:"COMPLETE"|"RUNNING"|"ERROR") => {
+                    if (isSerializable(txPayload)) {
+                        socket.emit(rxPayload.messageId, {
+                            messageId: rxPayload.messageId,
+                            status,
+                            payload: txPayload
+                        })
+                    } else {
+                        console.log(`Non serializable object detected in txPayload for action: ${action}. Please check input for the txPayload.`);
+                        socket.emit(rxPayload.messageId, {
+                            messageId: rxPayload.messageId,
+                            "status": "ERROR",
+                            payload: {
+                                message: `Non serializable object detected in txPayload for action: ${action}. Please check input for the txPayload on the server side.`
+                            }
+                        })
                     }
-                    callback(rxPayload, {
-                        reply,
-                        rxSocket: socket
-                    })
+                }
+                callback(rxPayload, {
+                    reply,
+                    rxSocket: socket
                 })
             })
-            socket.on('disconnect', () => {
-                console.log(`a user disconnected from channel: ${this.channelId}`)
-                console.log(`Number of users in channel: ${this.channelId}: ${this._channel.sockets.size}`)
-                this._disconnectHandler?.(this._channel, socket)
-            })
+        })
+        socket.on('disconnect', () => {
+            console.log(`a user disconnected from channel: ${this.channelId}`)
+            console.log(`Number of users in channel: ${this.channelId}: ${this._channel.sockets.size}`)
+            this._disconnectHandler?.(this._channel, socket)
         })
     }
 }

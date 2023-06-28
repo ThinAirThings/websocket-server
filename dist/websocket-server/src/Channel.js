@@ -25,38 +25,45 @@ class SocketioChannel {
                 console.log(`a user connected to channel: ${this.channelId}`);
                 console.log(`Number of users in channel: ${this.channelId}: ${this._channel.sockets.size}`);
                 this._connectionHandler?.(this._channel, socket);
-                this._actions && Object.entries(this._actions).forEach(([action, callback]) => {
-                    socket.on((0, txRx_1.rxToTx)(action), (rxPayload) => {
-                        const reply = (txPayload, status) => {
-                            if ((0, SocketioServer_1.isSerializable)(txPayload)) {
-                                socket.emit(rxPayload.messageId, {
-                                    messageId: rxPayload.messageId,
-                                    status,
-                                    payload: txPayload
-                                });
-                            }
-                            else {
-                                console.log(`Non serializable object detected in txPayload for action: ${action}. Please check input for the txPayload.`);
-                                socket.emit(rxPayload.messageId, {
-                                    messageId: rxPayload.messageId,
-                                    "status": "ERROR",
-                                    payload: {
-                                        message: `Non serializable object detected in txPayload for action: ${action}. Please check input for the txPayload on the server side.`
-                                    }
-                                });
-                            }
-                        };
-                        callback(rxPayload, {
-                            reply,
-                            rxSocket: socket
-                        });
+                this.updateSocketListeners(socket);
+            });
+            this._channel.sockets.forEach((socket) => {
+                socket.removeAllListeners();
+                this.updateSocketListeners(socket);
+            });
+        };
+        this.updateSocketListeners = (socket) => {
+            this._actions && Object.entries(this._actions).forEach(([action, callback]) => {
+                socket.on((0, txRx_1.rxToTx)(action), (rxPayload) => {
+                    const reply = (txPayload, status) => {
+                        if ((0, SocketioServer_1.isSerializable)(txPayload)) {
+                            socket.emit(rxPayload.messageId, {
+                                messageId: rxPayload.messageId,
+                                status,
+                                payload: txPayload
+                            });
+                        }
+                        else {
+                            console.log(`Non serializable object detected in txPayload for action: ${action}. Please check input for the txPayload.`);
+                            socket.emit(rxPayload.messageId, {
+                                messageId: rxPayload.messageId,
+                                "status": "ERROR",
+                                payload: {
+                                    message: `Non serializable object detected in txPayload for action: ${action}. Please check input for the txPayload on the server side.`
+                                }
+                            });
+                        }
+                    };
+                    callback(rxPayload, {
+                        reply,
+                        rxSocket: socket
                     });
                 });
-                socket.on('disconnect', () => {
-                    console.log(`a user disconnected from channel: ${this.channelId}`);
-                    console.log(`Number of users in channel: ${this.channelId}: ${this._channel.sockets.size}`);
-                    this._disconnectHandler?.(this._channel, socket);
-                });
+            });
+            socket.on('disconnect', () => {
+                console.log(`a user disconnected from channel: ${this.channelId}`);
+                console.log(`Number of users in channel: ${this.channelId}: ${this._channel.sockets.size}`);
+                this._disconnectHandler?.(this._channel, socket);
             });
         };
         this._channel = ioServer.of(channelId);

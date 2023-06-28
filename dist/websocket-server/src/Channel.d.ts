@@ -21,4 +21,5 @@ export declare class SocketioChannel {
     addActions: (actions: Record<string, (payload: any) => void>) => void;
     sendMessage: (action: string, payload: Record<string, any>) => void;
     private updateActions;
+    private updateSocketListeners;
 }
