@@ -54,6 +54,7 @@ export class SocketioChannel {
             this.updateSocketListeners(socket)
         })
         this._channel.sockets.forEach((socket) => {
+            console.log(socket)
             socket.removeAllListeners()
             this.updateSocketListeners(socket)
         })
