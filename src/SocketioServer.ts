@@ -1,6 +1,7 @@
 import { Server } from "http"
 import { Server as IoServer, Socket } from "socket.io"
 import { rxToTx } from "../../shared/txRx"
+import { SocketioChannel } from "./Channel"
 
 export class SocketioServer {
     ioServer: IoServer
@@ -46,59 +47,17 @@ export class SocketioServer {
             }
         })
     }
-    createChannel(channelId: string, actions: ConstructorParameters<typeof SocketioServer>[1], {
-        connectionHandler,
-        disconnectHandler
-    }:{ 
+    createChannel(channelId: string, opts?: {
+        actions?: Record<string, 
+            (payload: any, resources: {
+                reply:(payload: Record<string, any>, status?: "COMPLETE"|"RUNNING"|"ERROR")=>void
+                rxSocket: Socket
+            } )=>void
+        >
         connectionHandler?: (channel: ReturnType<SocketioServer['ioServer']['of']>, socket: Socket)=>void
         disconnectHandler?: (channel: ReturnType<SocketioServer['ioServer']['of']>, socket: Socket)=>void
     }){
-        const channel = this.ioServer.of(channelId)
-        channel.removeAllListeners().on('connection', (socket: Socket) => {
-            console.log(`a user connected to channel: ${channelId}`)
-            console.log(`Number of users in channel: ${channelId}: ${channel.sockets.size}`)
-            connectionHandler?.(channel, socket)
-            for (const [action, callback] of Object.entries(actions)){
-                socket.on(rxToTx(action), (rxPayload: {messageId: string}) => {
-                    const reply = (txPayload: Record<string, any>, status?:"COMPLETE"|"RUNNING"|"ERROR") => {
-                        if (isSerializable(txPayload)) {
-                            socket.emit(rxPayload.messageId, {
-                                messageId: rxPayload.messageId,
-                                status,
-                                payload: txPayload
-                            })
-                        } else {
-                            console.log(`Non serializable object detected in txPayload for action: ${action}. Please check input for the txPayload.`);
-                            socket.emit(rxPayload.messageId, {
-                                messageId: rxPayload.messageId,
-                                "status": "ERROR",
-                                payload: {
-                                    message: `Non serializable object detected in txPayload for action: ${action}. Please check input for the txPayload on the server side.`
-                                }
-                            })
-                        }
-                    }
-                    callback(rxPayload, {
-                        reply,
-                        rxSocket: socket
-                    })
-                })
-            }
-            socket.on('disconnect', () => {
-                console.log(`a user disconnected from channel: ${channelId}`)
-                console.log(`Number of users in channel: ${channelId}: ${channel.sockets.size}`)
-                disconnectHandler?.(channel, socket)
-            })
-        })
-        return {
-            channel,
-            sendMessage: (action: string, payload: Record<string, any>) => {
-                channel.emit(action, payload)
-            },
-            sendVolatileMessage: (action: string, payload: Record<string, any>) => {
-                channel.volatile.emit(action, payload)
-            }
-        }
+        return new SocketioChannel(this.ioServer, channelId, opts)
     }
     sendMessage( action: string, payload: Record<string, any>){
         this.ioServer.emit(action, payload)
@@ -109,7 +68,7 @@ export class SocketioServer {
 }
 
 // Deal with sanitizing the txPayload as Socketio fails silently if it is not a plain object
-type Serializable =
+export type Serializable =
   | string
   | number
   | boolean
@@ -118,7 +77,7 @@ type Serializable =
   | { [key: string]: Serializable }
   | Buffer;
 
-function isSerializable(value: any): value is Serializable {
+export function isSerializable(value: any): value is Serializable {
     if (
         typeof value === 'string' ||
         typeof value === 'number' ||

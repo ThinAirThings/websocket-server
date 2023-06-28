@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SocketioServer = void 0;
+exports.isSerializable = exports.SocketioServer = void 0;
 const socket_io_1 = require("socket.io");
 const txRx_1 = require("../../shared/txRx");
+const Channel_1 = require("./Channel");
 class SocketioServer {
     constructor(httpServer, actions) {
         this.ioServer = new socket_io_1.Server(httpServer, {
@@ -41,54 +42,8 @@ class SocketioServer {
             }
         });
     }
-    createChannel(channelId, actions, { connectionHandler, disconnectHandler }) {
-        const channel = this.ioServer.of(channelId);
-        channel.removeAllListeners().on('connection', (socket) => {
-            console.log(`a user connected to channel: ${channelId}`);
-            console.log(`Number of users in channel: ${channelId}: ${channel.sockets.size}`);
-            connectionHandler?.(channel, socket);
-            for (const [action, callback] of Object.entries(actions)) {
-                socket.on((0, txRx_1.rxToTx)(action), (rxPayload) => {
-                    const reply = (txPayload, status) => {
-                        if (isSerializable(txPayload)) {
-                            socket.emit(rxPayload.messageId, {
-                                messageId: rxPayload.messageId,
-                                status,
-                                payload: txPayload
-                            });
-                        }
-                        else {
-                            console.log(`Non serializable object detected in txPayload for action: ${action}. Please check input for the txPayload.`);
-                            socket.emit(rxPayload.messageId, {
-                                messageId: rxPayload.messageId,
-                                "status": "ERROR",
-                                payload: {
-                                    message: `Non serializable object detected in txPayload for action: ${action}. Please check input for the txPayload on the server side.`
-                                }
-                            });
-                        }
-                    };
-                    callback(rxPayload, {
-                        reply,
-                        rxSocket: socket
-                    });
-                });
-            }
-            socket.on('disconnect', () => {
-                console.log(`a user disconnected from channel: ${channelId}`);
-                console.log(`Number of users in channel: ${channelId}: ${channel.sockets.size}`);
-                disconnectHandler?.(channel, socket);
-            });
-        });
-        return {
-            channel,
-            sendMessage: (action, payload) => {
-                channel.emit(action, payload);
-            },
-            sendVolatileMessage: (action, payload) => {
-                channel.volatile.emit(action, payload);
-            }
-        };
+    createChannel(channelId, opts) {
+        return new Channel_1.SocketioChannel(this.ioServer, channelId, opts);
     }
     sendMessage(action, payload) {
         this.ioServer.emit(action, payload);
@@ -114,3 +69,4 @@ function isSerializable(value) {
     }
     return false;
 }
+exports.isSerializable = isSerializable;
