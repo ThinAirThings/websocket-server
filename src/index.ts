@@ -1,3 +1,3 @@
 export * from './SocketioServer'
 export * from './Channel'
-export * from './SocketioCommandClient'
+export * from './SocketioChannelCommandClient'

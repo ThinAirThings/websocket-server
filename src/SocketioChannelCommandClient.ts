@@ -2,7 +2,7 @@ import { CommandClient } from "@thinairthings/command-client";
 import { SocketioChannel } from "./Channel";
 
 
-export class SocketioCommandClient extends CommandClient {
+export class SocketioChannelCommandClient extends CommandClient {
     channel: SocketioChannel
     constructor(channel: SocketioChannel){
         super()
