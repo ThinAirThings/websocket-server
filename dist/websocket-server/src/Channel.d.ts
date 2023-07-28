@@ -18,6 +18,7 @@ export declare class SocketioChannel {
         disconnectHandler?: (channel: ReturnType<SocketioServer['ioServer']['of']>, socket: Socket) => void;
     });
     addAction: (action: string, callback: (payload: any) => void) => void;
+    removeAction: (action: string) => void;
     addActions: (actions: Record<string, (payload: any) => void>) => void;
     sendMessage: (action: string, payload: Record<string, any>) => void;
     private updateActions;

@@ -9,6 +9,16 @@ class SocketioChannelCommandClient extends command_client_1.CommandClient {
         this.sendMessage = (messageType, payload) => {
             this.channel.sendMessage(messageType, payload);
         };
+        this.subscribe = (action, callback) => {
+            this.channel.addAction(action, (payload) => {
+                callback(payload);
+            });
+            return {
+                unsubscribe: () => {
+                    this.channel.removeAction(action);
+                }
+            };
+        };
         this.channel = channel;
     }
 }
