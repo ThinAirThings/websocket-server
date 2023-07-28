@@ -10,6 +10,7 @@ class SocketioChannel {
             this._actions[action] = callback;
             this.updateActions();
         };
+        // NOTE: THIS IS BROKEN AND NEEDS TO BE FIXED
         this.addActions = (actions) => {
             this._actions = {
                 ...this._actions,

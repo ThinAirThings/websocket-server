@@ -18,8 +18,14 @@
   "keywords": [],
   "author": "Dan Lannan",
   "license": "MIT",
-  "dependencies": {
+  "devDependencies": {
     "nanoid": "^3.3.6",
-    "socket.io": "^4.6.1"
+    "socket.io": "^4.6.1",
+    "@thinairthings/command-client": "^1.0.3"
+  },
+  "peerDependencies": {
+    "nanoid": "^3.3.6",
+    "socket.io": "^4.6.1",
+    "@thinairthings/command-client": "^1.0.3"
   }
 }

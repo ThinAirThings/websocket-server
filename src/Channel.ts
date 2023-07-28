@@ -36,6 +36,7 @@ export class SocketioChannel {
         this._actions[action] = callback
         this.updateActions()
     }   
+    // NOTE: THIS IS BROKEN AND NEEDS TO BE FIXED
     addActions = (actions: Record<string, (payload: any)=>void>) => {
         this._actions = {
             ...this._actions,
