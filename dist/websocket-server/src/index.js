@@ -16,3 +16,4 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./SocketioServer"), exports);
 __exportStar(require("./Channel"), exports);
+__exportStar(require("./SocketioCommandClient"), exports);
